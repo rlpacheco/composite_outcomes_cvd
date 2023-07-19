@@ -1,0 +1,287 @@
+clear all
+
+capture log close
+
+version 17
+
+local directory "C:\Users\rleit\Desktop\Trabalhos 2021\valeria\codigos finais"
+
+cd "`directory'"
+
+use raw_for_analysis.dta
+
+tabulate tem_composto
+
+**# Bookmark #4
+*** The following lines are recoding components of composite outcomes. 
+**# Bookmark #1
+
+replace componente1 = "all-cause mortality" if componente1 == "Death"
+replace componente1 = "all-cause mortality" if componente1 == "Death from any cause"
+replace componente1 = "all-cause mortality" if componente1 == "All-cause mortality"
+replace componente1 = "all-cause mortality" if componente1 == "death"
+replace componente1 = "all-cause mortality" if componente1 == "all-cause death"
+
+replace componente1 = "cardiovascular death" if componente1 == "Cardiovascular death"
+replace componente1 = "cardiovascular death" if componente1 == "Death due to coronary heart disease"
+replace componente1 = "cardiovascular death" if componente1 == "Death from cardiovascular causes"
+replace componente1 = "cardiovascular death" if componente1 == "cardiovascular death including cardiac sudden death"
+
+replace componente1 = "myocardial infarction" if componente1 == "Myocardial infarction"
+
+replace componente1 = "major bleeding" if componente1 == "Major bleeding"
+
+tabulate componente1
+
+
+**# component 2
+replace componente2 = "myocardial infarction" if componente2 == "miocardial infartaction"
+replace componente2 = "myocardial infarction" if componente2 == "non-fatal myocardial infarction"
+replace componente2 = "myocardial infarction" if componente2 == "nonfatal myocardial infarction"
+replace componente2 = "myocardial infarction" if componente2 == "spontaneous (nonprocedural) myocardial infarction"
+  
+replace componente2 = "acute coronary syndrome" if componente2 == "ACS (STEMI/non-STEMI/unstable angina)"
+
+tabulate componente2
+
+**# component 3
+
+replace componente3 = "stroke" if componente3 == "ischaemic stroke"
+replace componente3 = "stroke" if componente3 == "nonfatal stroke"
+replace componente3 = "stroke" if componente3 == "ischemic stroke"
+replace componente3 = "stroke" if componente3 == "non-fatal stroke"
+replace componente3 = "stroke" if componente3 == "cerebral stroke excluding transient ischemic attack"
+replace componente3 = "stroke" if componente3 == "major cerebrovascular event"
+
+replace componente3 = "cardiovascular death" if componente3 == "death from vascular causes"
+
+replace componente3 = "ischemia-driven revascularization" if componente3 == "ischemia-driven urgent revascularization"
+
+tabulate componente3
+
+replace componente3 = strtrim(componente3)
+
+tabulate componente3
+
+**# component 4 ( here we slipt the variable, as in the data sheet we extracted the forth and subsequent components in a single variable. The maximum of components were 3: coded 41 42 42 below)
+
+split componente4, p(,)
+
+order componente4 componente41 componente42 componente43
+
+**# component 41
+
+replace componente41 = "ischemia-driven revascularization" if componente41 == "ischemia-driven revascularization"
+replace componente41 = "ischemia-driven revascularization" if componente41 == "ischemia-driven coronary revascularization"
+replace componente41 = "ischemia-driven revascularization" if componente41 == "coronary revascularization"
+replace componente41 = "ischemia-driven revascularization" if componente41 == "urgent target vessel revascularisation"
+replace componente41 = "ischemia-driven revascularization" if componente41 == "unstable angina requiring revascularization"
+
+replace componente41 = "stroke" if componente41 == "noncardioembolic ischemic stroke"
+
+replace componente41 = "hospitalization for unstable angina" if componente41 == "hospital admission due to unstable angina"
+replace componente41 = "hospitalization for unstable angina" if componente41 == "unstable angina requiring hospitalization"
+
+
+**# component 42
+
+replace componente42 = strtrim(componente42)
+
+replace componente42 = "all-cause mortality" if componente42 == "death from any cause"
+
+replace componente42 = "ischemia-driven revascularization" if componente42 == "coronary revascularization"
+replace componente42 = "ischemia-driven revascularization" if componente42 == "unstable angina requiring revascularization"
+
+replace componente42 = "hospitalization for heart failure" if componente42 == "hospital admission due to heart failure"
+
+
+tabulate componente42
+
+**# component 43 ( did not require recode )
+
+tabulate componente43
+
+
+/* unique components recoded
+
+
+d1	acute coronary syndrome						
+d2  all-cause mortality
+d3 	cardiovascular death
+d4 	cardiovascular or undetermined death
+d5 	hospitalization for heart failure
+d6  hospitalization for unstable angina 
+d7  ischemia-driven revascularization
+d8  major bleeding
+d9  major adverse cardiac event
+d10 myocardial infarction
+d11 systemic embolism
+d12 stroke
+
+*/
+
+
+** the following codes are used to reorder components and creat a variable "composite outcome" with all components recoded and in alphabetical order
+
+
+order componente1 componente2 componente3
+
+generate d1_acute_coronary_syndrome = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d1_acute_coronary_syndrome = "acute coronary syndrome" if `var' == "acute coronary syndrome"
+}
+
+
+generate str d2_all_cause_mortality = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d2_all_cause_mortality = "all-cause mortality" if `var' == "all-cause mortality"
+}
+
+generate d3_cardiovascular_death = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d3_cardiovascular_death = "cardiovascular death" if `var' == "cardiovascular death"
+}
+
+generate d4_cardiovascular_or_unde = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d4_cardiovascular_or_unde = "cardiovascular or undetermined death" if `var' == "cardiovascular or undetermined death"
+}
+
+generate d5_hospitalization_for_hf = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d5_hospitalization_for_hf = "hospitalization for heart failure" if `var' == "hospitalization for heart failure"
+}
+
+generate d6_hospitalization_for_ua = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d6_hospitalization_for_ua = "hospitalization for unstable angina" if `var' == "hospitalization for unstable angina"
+}
+
+generate d7_ischemia_driven_revasc = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d7_ischemia_driven_revasc = "ischemia-driven revascularization" if `var' == "ischemia-driven revascularization"
+}
+
+generate d8_major_bleeding = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d8_major_bleeding = "major bleeding" if `var' == "major bleeding"
+}
+
+
+generate d9_major_adverse_cardiac_event = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d9_major_adverse_cardiac_event = "major adverse cardiac event" if `var' == "major adverse cardiac event"
+}
+
+generate d10_myocardial_infarction = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d10_myocardial_infarction = "myocardial infarction" if `var' == "myocardial infarction"
+}
+
+generate d11_systemic_embolism = "0"
+
+foreach var of varlist componente1-componente43 {
+	
+	replace d11_systemic_embolism = "systemic embolism" if `var' == "systemic embolism"
+}
+
+generate d12_stroke = "0"
+
+foreach var of varlist componente1-componente43 { 
+	
+	replace d12_stroke = "stroke" if `var' == "stroke"
+}
+
+** Table 3. Frequency of occurrence of each component in the primary composite outcomes.
+foreach var of varlist d1_acute_coronary_syndrome-d12_stroke { 
+	
+	tabulate `var'
+}
+
+generate composite_outcome = "10" + d1_acute_coronary_syndrome + "0" + d2_all_cause_mortality + "0" + d3_cardiovascular_death + "0" +d4_cardiovascular_or_unde + "0" + d5_hospitalization_for_hf + "0" + d6_hospitalization_for_ua + "0" + d7_ischemia_driven_revasc + "0" + d8_major_bleeding + "0" + d9_major_adverse_cardiac_event + "0" + d10_myocardial_infarction + "0" + d11_systemic_embolism + "0" + d12_stroke + "1"
+
+replace composite_outcome = subinstr(composite_outcome, "000000000000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "00000000000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "0000000000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "000000000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "00000000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "0000000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "000000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "00000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "0000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "000000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "00000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "0000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "000", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "00", ", ", .)
+replace composite_outcome = subinstr(composite_outcome, "0", ", ", .)
+
+replace composite_outcome = subinstr(composite_outcome, "1, " , "", .)
+replace composite_outcome = subinstr(composite_outcome, ", 1" , "", .)
+replace composite_outcome = subinstr(composite_outcome, "1" , "", .)
+
+
+
+
+tabulate composite_outcome
+
+
+
+* dropping intermediate variables
+
+drop d1_acute_coronary_syndrome - d12_stroke
+drop componente1 - componente43
+
+order desfechoprimário1 composite_outcome
+
+
+
+** Table 2. Frequency of composite primary outcomes
+table composite_outcome, stat(percent) stat(frequency)
+
+* Mace analysis
+
+table composite_outcome if mace=="s"
+
+
+** Table 4. Reporting practices in relation with the primary composite outcomes
+
+* number of studies that reported all components
+tabulate componentes_relatados if componentes_relatados != "." 
+
+* local of reporting if study reported all components
+tabulate componentes_local if componentes_relatados == "sim"
+
+* clinical balance of composite outcomes 
+tabulate componentes_balanceados if tem_composto== "sim"
+
+* consistency of components and overall composite outcome effect
+
+tabulate componentes_consistentes if componentes_relatados  == "sim" 
+
+* number of components
+destring n_componentes, replace
+summarize n_componentes, detail
+
+* discussion of study limitation
+tabulate disc_limitacao if tem_composto == "sim"
