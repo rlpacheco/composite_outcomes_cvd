@@ -7,3 +7,10 @@ Authors: Valéria Mozetic de Barros, Rafael Leite Pacheco, Ana Luiza Cabrera Mar
 
 Author for correspondence: Rafael Leite Pacheco. E-mail: rleitepacheco@hotmail.com.
 
+
+## Files
+1. Code: dofile_stata
+2. Data: raw_for_analysis
+3. Recoded outcomes : recoded_composite_outcomes
+  
+
