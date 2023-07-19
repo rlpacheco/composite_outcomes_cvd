@@ -4,7 +4,7 @@ capture log close
 
 version 17
 
-local directory "C:\Users\rleit\Desktop\Trabalhos 2021\valeria\codigos finais"
+local directory "ADD YOUR DIRECTORY"
 
 cd "`directory'"
 
